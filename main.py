@@ -275,25 +275,6 @@ if __name__ == "__main__":
     else:
         notex="好像没有需要特别注意的,那就祝你开心啦"
     
-    # ########更改推送时间⬇️
-    # week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
-    # yearx = localtime().tm_year
-    # monthx = localtime().tm_mon
-    # dayx = localtime().tm_mday
-    # today = datetime.date(datetime(year=yearx, month=monthx, day=dayx))
-    # week = week_list[today.isoweekday() % 7]
-    # with open('.github\\workflows\\weixin.yml', 'r',encoding='utf-8') as f:
-    #     lines = f.readlines()
-
-    # if week in ["星期日","星期一","星期二"]:
-    #     lines[5] = "    - cron: '30 23 * * *'\n"  # 修改第6行的内容为七点半推送
-    # elif week in ["星期三","星期四","星期五","星期六"]:
-    #     lines[5] = "    - cron: '30 1 * * *'\n"  # 修改第6行的内容为九点半推送
-
-    # with open('.github\\workflows\\weixin.yml', 'w',encoding='utf-8') as f:
-    #     f.writelines(lines)
-    # ########更改推送时间⬆️
-
 
     # 公众号推送消息
     for user in users:
