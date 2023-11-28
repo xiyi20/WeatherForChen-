@@ -5,8 +5,6 @@ from requests import get, post
 from datetime import datetime,date
 
 
-
-
 # 获取随机颜色
 def get_color():
     def get_colors(n):
@@ -27,8 +25,8 @@ def get_access_token():
     except KeyError:
         print("获取access_token失败,请检查app_id和app_secret是否正确")
     return access_token
- 
- 
+
+
 def get_weather(region):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
@@ -58,8 +56,7 @@ def get_weather(region):
 def bir(birthday):
     # 获取当前日期
     now = datetime.now()
-    # 获取用户输入的出生日期
-    # 将用户输入的出生日期字符串转换为datetime对象
+    # 将用户的出生日期字符串转换为datetime对象
     birthday = datetime.strptime(birthday, "%Y-%m-%d")
     # 计算今年生日的日期
     this_year_birthday = datetime(now.year, birthday.month, birthday.day)
@@ -89,14 +86,13 @@ resou3=a['result']['list'][2]['word']
 urly='https://apis.tianapi.com/star/index?key=0286f08d7d10479012b557d0cf9bb225&astro=sagittarius'
 health=get(urly,headers)
 health=json.loads(health.text)
-zhe=str(health['result']['list'][0]['content']).replace('%','')
-aqing=str(health['result']['list'][1]['content']).replace('%','')
-cyun=str(health['result']['list'][3]['content']).replace('%','')
-jkang=str(health['result']['list'][4]['content']).replace('%','')
+zonghe=str(health['result']['list'][0]['content']).replace('%','')
+aiqing=str(health['result']['list'][1]['content']).replace('%','')
+caiyun=str(health['result']['list'][3]['content']).replace('%','')
+jiankang=str(health['result']['list'][4]['content']).replace('%','')
 gshu=str(health['result']['list'][8]['content'])
 
 
-  
 def get_ciba():
     url = "http://open.iciba.com/dsapi/"
     headers = {
@@ -110,7 +106,7 @@ def get_ciba():
     return note_ch, note_en
  
  
-def send_message(to_user,notex,birthdaydata1,birthdaydata2,access_token,region_name,weather,temp,wind_dir,zhe,aqing,cyun,jkang,gshu,resou1,resou2,resou3,note_ch,note_en):
+def send_message(to_user,notex,birthdaydata1,birthdaydata2,access_token,region_name,weather,temp,wind_dir,zonghe,aiqing,caiyun,jiankang,gshu,resou1,resou2,resou3,note_ch,note_en):
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     yearx = localtime().tm_year
     monthx = localtime().tm_mon
@@ -123,11 +119,7 @@ def send_message(to_user,notex,birthdaydata1,birthdaydata2,access_token,region_n
     love_date = date(love_year, love_month, love_day)
     # 获取在一起的日期差
     love_days = str(today.__sub__(love_date)).split(" ")[0]
-    # 获取所有生日数据
-    birthdays = {}
-    for k, v in config.items():
-        if k[0:5] == "birth":
-            birthdays[k] = v
+   
     data = {
         "touser": to_user,
         "template_id": config["template_id"],
@@ -136,79 +128,60 @@ def send_message(to_user,notex,birthdaydata1,birthdaydata2,access_token,region_n
         "data": {
             "date": {
                 "value": "{}".format(today),
-                "color": get_color()
             },
             "region": {
-                "value": region_name,
-                "color": get_color()
+                "value": region_name
             },
             "birthdaydata1": {
-                "value": birthdaydata1,
-                "color": get_color()
+                "value": birthdaydata1
             },
             "birthdaydata2": {
-                "value": birthdaydata2,
-                "color": get_color()
+                "value": birthdaydata2
             },
             "weather": {
-                "value": weather,
-                "color": get_color()
+                "value": weather
             },
             "notex": {
-                "value": notex,
-                "color": get_color()
+                "value": notex
             },
             "temp": {
-                "value": temp,
-                "color": get_color()
+                "value": temp
             },
             "wind_dir": {
-                "value": wind_dir,
-                "color": get_color()
+                "value": wind_dir
             },
             "love_day": {
-                "value": love_days,
-                "color": get_color()
+                "value": love_days
             },
-            "zhe": {
-                "value": zhe,
-                "color": get_color()
+            "zonghe": {
+                "value": zonghe
             },
-            "cyun": {
-                "value": cyun,
-                "color": get_color()
+            "caiyun": {
+                "value": caiyun
             },
-            "jkang": {
-                "value": jkang,
-                "color": get_color()
+            "jiankang": {
+                "value": jiankang
             },
-            "aqing": {
-                "value": aqing,
-                "color": get_color()
+            "aiqing": {
+                "value": aiqing
             },
             "gshu": {
-                "value": gshu,
-                "color": get_color()
+                "value": gshu
             },
             "resou1": {
-                "value": resou1,
-                "color": get_color()
+                "value": resou1
             },
             "resou2": {
-                "value": resou2,
-                "color": get_color()
+                "value": resou2
             },
             "resou3": {
-                "value": resou3,
-                "color": get_color()
+                "value": resou3
             },
             "note_en": {
-                "value": note_en,
-                "color": get_color()
+                "value": note_en
             },
             "note_ch": {
-                "value": note_ch,
-                "color": get_color()
+                "value": note_ch
             }
         }
     }
@@ -230,7 +203,8 @@ if __name__ == "__main__":
         with open("config.txt", encoding="utf-8") as f:
             config = eval(f.read())
     except FileNotFoundError:
-        print("推送消息失败,请检查config.txt文件是否与程序位于同一路径")
+        with open("git/ForChen/config.txt", encoding="utf-8") as f:
+            config = eval(f.read())
     except SyntaxError:
         print("推送消息失败,请检查配置文件格式是否正确")
 
@@ -274,14 +248,14 @@ if __name__ == "__main__":
         notex="今天天气应该会很舒服喔"
     else:
         notex="好像没有需要特别注意的,那就祝你开心啦"
-    
+
 
     # 公众号推送消息
     for user in users:
         send_message(user,notex,
-                     birthdaydata1,birthdaydata2,
-                     accessToken,region,
-                     weather,temp,wind_dir,
-                     zhe,aqing,cyun,jkang,gshu,
-                     resou1,resou2,resou3,
-                     note_ch,note_en)
+            birthdaydata1,birthdaydata2,
+            accessToken,region,
+            weather,temp,wind_dir,
+            zonghe,aiqing,caiyun,jiankang,gshu,
+            resou1,resou2,resou3,
+            note_ch,note_en)
