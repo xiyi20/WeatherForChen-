@@ -6,12 +6,12 @@ from datetime import datetime,date
 
 
 # 获取随机颜色
-def get_color():
-    def get_colors(n):
-        return ["#" + "%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
-    color_list = get_colors(1000)
-    return random.choice(color_list)
-
+# def get_color():
+#     def get_colors(n):
+#         return ["#" + "%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
+#     color_list = get_colors(1000)
+#     return random.choice(color_list)
+#!!!有问题，待修复
 
 def get_access_token():
     # appId
@@ -26,31 +26,30 @@ def get_access_token():
         print("获取access_token失败,请检查app_id和app_secret是否正确")
     return access_token
 
-
-def get_weather(region):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
-    }
-    key = config["weather_key"]
-    region_url = "https://geoapi.qweather.com/v2/city/lookup?location={}&key={}".format(region, key)
-    response = get(region_url, headers=headers).json()
-    if response["code"] == "404":
-        print("推送消息失败,请检查地区名是否有误!")
-    elif response["code"] == "401":
-        print("推送消息失败,请检查和风天气key是否正确!")
-    else:
-        # 获取地区的location--id
-        location_id = response["location"][0]["id"]
-    weather_url = "https://devapi.qweather.com/v7/weather/now?location={}&key={}".format(location_id, key)
+#获取天气
+def get_weather(headers,region,key):
+    weather_url='https://apis.tianapi.com/tianqi/index?key={}&city={}&type=7'.format(key,region)
     response = get(weather_url, headers=headers).json()
-    # 天气
-    weather = response["now"]["text"]
-    # 当前温度
-    temp = response["now"]["temp"]
-    # 风向
-    wind_dir = response["now"]["windDir"]
-    return weather, temp, wind_dir
+    if response["code"]=="230":
+        print("key错误或为空")
+    elif response["code"]=="260" or response["code"]=='250':
+        print("城市错误或为空")
+    temp1=response['result']['list'][0]
+    today_date=temp1['date']
+    today_temp=str(temp1['lowest']).replace('℃','')+'~'+str(temp1['highest']).replace('℃','')
+    today_weather=temp1['weather']
+    today_wind=temp1['wind']
+    today_tips=response['result']['list'][0]['tips']
+    
+    temp2=response['result']['list'][1]
+    tomorrow_date=temp2['date']
+    tomorrow_temp=str(temp2['lowest']).replace('℃','')+'~'+str(temp2['highest']).replace('℃','')
+    tomorrow_weather=temp2['weather']
+    tomorrow_wind=temp2['wind']
+    tomorrow_tips=response['result']['list'][1]['tips']
+
+    return today_date,today_weather,today_temp,today_wind,today_tips,\
+            tomorrow_date,tomorrow_weather,tomorrow_temp,tomorrow_wind,tomorrow_tips
 
 #生日在这里
 def bir(birthday):
@@ -69,44 +68,51 @@ def bir(birthday):
     birthday=(time_to_birthday.days)
     return birthday
 
+
 #今日热搜
-urlx='https://apis.tianapi.com/toutiaohot/index?key=0286f08d7d10479012b557d0cf9bb225'
-headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
-    }
-a=get(urlx,headers)
-a=json.loads(a.text)
-resou1=a['result']['list'][0]['word']
-resou2=a['result']['list'][1]['word']
-resou3=a['result']['list'][2]['word']
+def get_hotpoint(headers):
+    urlx='https://apis.tianapi.com/toutiaohot/index?key={}'.format(key)
+    a=get(urlx,headers)
+    a=json.loads(a.text)
+    hotpoint1=a['result']['list'][0]['word']
+    hotpoint2=a['result']['list'][1]['word']
+    hotpoint3=a['result']['list'][2]['word']
+    return hotpoint1,hotpoint2,hotpoint3
 
 
 #今日星座运势
-urly='https://apis.tianapi.com/star/index?key=0286f08d7d10479012b557d0cf9bb225&astro=sagittarius'
-health=get(urly,headers)
-health=json.loads(health.text)
-zonghe=str(health['result']['list'][0]['content']).replace('%','')
-aiqing=str(health['result']['list'][1]['content']).replace('%','')
-caiyun=str(health['result']['list'][3]['content']).replace('%','')
-jiankang=str(health['result']['list'][4]['content']).replace('%','')
-gshu=str(health['result']['list'][8]['content'])
+def get_xingzuo(headers,key):
+    urly='https://apis.tianapi.com/star/index?key={}&astro=sagittarius'.format(key)
+    health=get(urly,headers)
+    health=json.loads(health.text)
+    zonghe=str(health['result']['list'][0]['content']).replace('%','')
+    aiqing=str(health['result']['list'][1]['content']).replace('%','')
+    caiyun=str(health['result']['list'][3]['content']).replace('%','')
+    jiankang=str(health['result']['list'][4]['content']).replace('%','')
+    gshu=str(health['result']['list'][8]['content'])
+    return zonghe,aiqing,caiyun,jiankang,gshu
 
-
-def get_ciba():
+#获取语句
+def get_content(headers,key):
     url = "http://open.iciba.com/dsapi/"
-    headers = {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
-    }
     r = get(url, headers=headers)
     note_en = r.json()["content"]
     note_ch = r.json()["note"]
-    return note_ch, note_en
+    url='https://apis.tianapi.com/wanan/index?key={}'.format(key)
+    r = get(url,headers)
+    note_wanan=r.json()['result']['content']
+    return note_ch,note_en,note_wanan
  
- 
-def send_message(to_user,notex,birthdaydata1,birthdaydata2,access_token,region_name,weather,temp,wind_dir,zonghe,aiqing,caiyun,jiankang,gshu,resou1,resou2,resou3,note_ch,note_en):
+
+def send_message(to_user,today_tips,tomorrow_tips,
+                 today_date,tomorrow_date,
+                 birthdaydata1,birthdaydata2,
+                 access_token,region,
+                 today_weather,today_temp,today_wind,
+                 tomorrow_weather,tomorrow_temp,tomorrow_wind,
+                 zonghe,aiqing,caiyun,jiankang,gshu,
+                 hotpoint1,hotpoint2,hotpoint3,
+                 note_ch,note_en,note_wanan):
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     yearx = localtime().tm_year
     monthx = localtime().tm_mon
@@ -119,18 +125,26 @@ def send_message(to_user,notex,birthdaydata1,birthdaydata2,access_token,region_n
     love_date = date(love_year, love_month, love_day)
     # 获取在一起的日期差
     love_days = str(today.__sub__(love_date)).split(" ")[0]
-   
+    #区分白天和晚上，推送不同模板
+    timenow=datetime.now().hour
+    if timenow<22:
+        template=config["template_morning_id"]
+    else:
+        template=config["template_night_id"]
     data = {
         "touser": to_user,
-        "template_id": config["template_id"],
+        "template_id": template,
         "url": "http://weixin.qq.com/download",
-        "topcolor": "#FF0000",
+        # "topcolor": "#FF0000",
         "data": {
-            "date": {
-                "value": "{}".format(today),
+             "today_date": {
+                "value": today_date
+            },
+            "tomorrow_date": {
+                "value": tomorrow_date
             },
             "region": {
-                "value": region_name
+                "value": region
             },
             "birthdaydata1": {
                 "value": birthdaydata1
@@ -138,17 +152,29 @@ def send_message(to_user,notex,birthdaydata1,birthdaydata2,access_token,region_n
             "birthdaydata2": {
                 "value": birthdaydata2
             },
-            "weather": {
-                "value": weather
+            "today_weather": {
+                "value": today_weather
             },
-            "notex": {
-                "value": notex
+            "tomorrow_weather": {
+                "value": tomorrow_weather
             },
-            "temp": {
-                "value": temp
+            "today_tips": {
+                "value": today_tips
             },
-            "wind_dir": {
-                "value": wind_dir
+            "tomorrow_tips": {
+                "value": tomorrow_tips
+            },
+            "today_temp": {
+                "value": today_temp
+            },
+            "tomorrow_temp": {
+                "value": tomorrow_temp
+            },
+            "today_wind": {
+                "value": today_wind
+            },
+            "tomorrow_wind": {
+                "value": tomorrow_wind
             },
             "love_day": {
                 "value": love_days
@@ -168,22 +194,30 @@ def send_message(to_user,notex,birthdaydata1,birthdaydata2,access_token,region_n
             "gshu": {
                 "value": gshu
             },
-            "resou1": {
-                "value": resou1
+            "hotpoint1": {
+                "value": hotpoint1
             },
-            "resou2": {
-                "value": resou2
+            "hotpoint2": {
+                "value": hotpoint2
             },
-            "resou3": {
-                "value": resou3
+            "hotpoint3": {
+                "value": hotpoint3
             },
             "note_en": {
                 "value": note_en
             },
             "note_ch": {
                 "value": note_ch
+            },
+            "note_wanan": {
+                "value": note_wanan
             }
         }
+    }
+    headers = {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (today_windows NT 10.0; Win64; x64) '
+                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
     }
     response = post(url, headers=headers, json=data).json()
     if response["errcode"] == 40037:
@@ -199,6 +233,10 @@ def send_message(to_user,notex,birthdaydata1,birthdaydata2,access_token,region_n
 
 
 if __name__ == "__main__":
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (today_windows NT 10.0; Win64; x64) '
+                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+    }
     try:
         with open("config.txt", encoding="utf-8") as f:
             config = eval(f.read())
@@ -212,50 +250,40 @@ if __name__ == "__main__":
     accessToken = get_access_token()
     # 接收的用户
     users = config["user"]
-    # 传入地区获取天气信息
+    # 传入地区
     region = config["region"]
-    weather, temp, wind_dir = get_weather(region)
+    key = config["tianxing_key"]
+    today_date,today_weather,today_temp,today_wind,today_tips,\
+        tomorrow_date,tomorrow_weather,tomorrow_temp,tomorrow_wind,tomorrow_tips=get_weather(headers,region,key)
+    zonghe,aiqing,caiyun,jiankang,gshu=get_xingzuo(headers,key)
+    hotpoint1,hotpoint2,hotpoint3=get_hotpoint(headers)
     note_ch = config["note_ch"]
     note_en = config["note_en"]
     # 获取词霸每日金句
     if note_ch == "" and note_en == "":
-        note_ch, note_en = get_ciba()
+        note_ch,note_en,note_wanan=get_content(headers,key)
     #获取生日
     b1=bir(config["birthday1"])
+    name1=config["name1"]
     if b1==0:
-        birthdaydata1 = "今天是欣怡宝宝的生日哦,祝欣怡宝宝生日快乐!"
+        birthdaydata1 = "今天是%s的生日哦,祝%s生日快乐!"%name1
     else:
-        birthdaydata1 = "距离欣怡的生日还有%s天"%b1
+        birthdaydata1 = "距离%s的生日还有%s天"%(name1,b1)
     b2=bir(config["birthday2"])
+    name2=config["name2"]
     if b2==0:
-        birthdaydata2 = "今天是夕超的生日哦,祝自己生日快乐!"
+        birthdaydata2 = "今天是%s的生日哦,祝自己生日快乐!"%name2
     else:
-        birthdaydata2 = "距离夕超的生日还有%s天"%b2
-    #获取提醒
-    if(weather=="阴" and int(temp)<=15):
-        notex="今天天气比较冷,记得多穿件衣服"
-    elif(weather=="晴" and int(temp)>=25):
-        notex="今天会很热,可以带把伞遮太阳"
-    elif(weather=="小雨" or weather=="中雨" or weather=="大雨"):
-        notex="今天会下雨哦,记得带伞"
-    elif((weather=="小雪" or weather=="中雪" or weather=="大雪")and int(temp)<=5):
-        notex="今天会下雪哦,多穿衣服也可以打打雪仗"
-    elif(int(temp)<=5):
-        notex="今天会很冷,得多穿几件衣服"
-    elif(int(temp)>=30):
-        notex="今天特别热,注意不要中暑了,记得多喝水"
-    elif(18<=int(temp)<=20):
-        notex="今天天气应该会很舒服喔"
-    else:
-        notex="好像没有需要特别注意的,那就祝你开心啦"
-
+        birthdaydata2 = "距离%s的生日还有%s天"%(name1,b2)
 
     # 公众号推送消息
     for user in users:
-        send_message(user,notex,
-            birthdaydata1,birthdaydata2,
-            accessToken,region,
-            weather,temp,wind_dir,
-            zonghe,aiqing,caiyun,jiankang,gshu,
-            resou1,resou2,resou3,
-            note_ch,note_en)
+        send_message(user,today_tips,tomorrow_tips,
+                 today_date,tomorrow_date,
+                 birthdaydata1,birthdaydata2,
+                 accessToken,region,
+                 today_weather,today_temp,today_wind,
+                 tomorrow_weather,tomorrow_temp,tomorrow_wind,
+                 zonghe,aiqing,caiyun,jiankang,gshu,
+                 hotpoint1,hotpoint2,hotpoint3,
+                 note_ch,note_en,note_wanan)
