@@ -1,0 +1,31 @@
+❤️早安欣怡宝宝💕
+
+
+亲爱的欣怡宝宝🐷:
+💖!今天是我喜欢你的第{{love_day.DATA}}天啦!💖
+💘状况{
+　　日期:{{today_date.DATA}}
+　　城市:{{region.DATA}}
+　　天气:{{today_weather.DATA}}
+　　温度:{{today_temp.DATA}}℃
+　　风向:{{today_wind.DATA}}
+　　注意:{{today_tips.DATA}}
+}
+💝运势{
+　　综合指数:{{zonghe.DATA}}
+　　财运指数:{{caiyun.DATA}}
+　　健康指数:{{jiankang.DATA}}
+　　爱情概述:{{aiqing.DATA}}(别信!)
+}
+🎉生日{
+　　{{birthdaydata1.DATA}}
+　　{{birthdaydata2.DATA}}
+}
+✨热搜{
+　　热点一:{{hotpoint1.DATA}}
+　　热点二:{{hotpoint2.DATA}}
+　　热点三:{{hotpoint3.DATA}}
+}
+🥳每日一句{
+　　{{note_ch.DATA}}
+}
