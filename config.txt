@@ -8,7 +8,7 @@
 "template_morning_id": "sXLDxuDtdU7wEyiDNPDIIlCKJizfX4_3bvhh6K2SEz0",
 "template_night_id": "AKd_twBPPAAERJlRNyEi0CpHpTuCsOBJEYNu5GbMKRw",
 # 接收公众号消息的微信号，如果有多个，需要在[]里用英文逗号间隔，例如["wx1", "wx2"]
-"user": ["o1sJB5-LMVMeAwpMVqnQx9Gr6sAU"],
+"user": ["o1sJB5-LMVMeAwpMVqnQx9Gr6sAU", "o1sJB59aj8gpaenFiNspnIRv_yrw"],
 #, "o1sJB59aj8gpaenFiNspnIRv_yrw"
 # 信息配置
 # 天行数据api
