@@ -274,7 +274,7 @@ if __name__ == "__main__":
     if b2==0:
         birthdaydata2 = "今天是%s的生日哦,祝自己生日快乐!"%name2
     else:
-        birthdaydata2 = "距离%s的生日还有%s天"%(name1,b2)
+        birthdaydata2 = "距离%s的生日还有%s天"%(name2,b2)
 
     # 公众号推送消息
     for user in users:
