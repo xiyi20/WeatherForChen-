@@ -56,16 +56,16 @@ def bir(birthday):
     # 获取当前日期
     now=datetime.now()
     # 将用户的出生日期字符串转换为datetime对象
-    birthday=datetime.strptime(birthday, "%Y-%m-%d")
+    birthday=datetime.strptime(birthday,"%Y-%m-%d")
     # 计算今年生日的日期
-    this_year_birthday=datetime(now.year, birthday.month, birthday.day)
+    this_year_birthday=datetime(now.year,birthday.month,birthday.day)
     # 如果今年生日已经过了,则计算明年生日的日期
     if this_year_birthday<now:
-        this_year_birthday=datetime(now.year + 1, birthday.month, birthday.day)
+        this_year_birthday=datetime(now.year+1,birthday.month,birthday.day)
     # 计算距离今年生日还有多久时间
-    time_to_birthday=this_year_birthday-now+1
+    time_to_birthday=this_year_birthday-now
     # 输出结果
-    birthday=(time_to_birthday.days)
+    birthday=(time_to_birthday.days+1)
     return birthday
 
 
