@@ -9,19 +9,19 @@ from datetime import datetime,date
 # def get_color():
 #     def get_colors(n):
 #         return ["#" + "%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
-#     color_list = get_colors(1000)
+#     color_list=get_colors(1000)
 #     return random.choice(color_list)
 #!!!有问题，待修复
 
 def get_access_token():
     # appId
-    app_id = config["app_id"]
+    app_id=config["app_id"]
     # appSecret
-    app_secret = config["app_secret"]
-    post_url = ("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}"
+    app_secret=config["app_secret"]
+    post_url=("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}"
                 .format(app_id, app_secret))
     try:
-        access_token = get(post_url).json()['access_token']
+        access_token=get(post_url).json()['access_token']
     except KeyError:
         print("获取access_token失败,请检查app_id和app_secret是否正确")
     return access_token
@@ -29,7 +29,7 @@ def get_access_token():
 #获取天气
 def get_weather(headers,region,key):
     weather_url='https://apis.tianapi.com/tianqi/index?key={}&city={}&type=7'.format(key,region)
-    response = get(weather_url, headers=headers).json()
+    response=get(weather_url, headers=headers).json()
     if response["code"]=="230":
         print("key错误或为空")
     elif response["code"]=="260" or response["code"]=='250':
@@ -53,7 +53,6 @@ def get_weather(headers,region,key):
 
 #生日在这里
 def bir(birthday):
-    # 获取当前日期
     now=datetime.now()
     # 将用户的出生日期字符串转换为datetime对象
     birthday=datetime.strptime(birthday,"%Y-%m-%d")
@@ -94,12 +93,12 @@ def get_xingzuo(headers,key):
 
 #获取语句
 def get_content(headers,key):
-    url = "http://open.iciba.com/dsapi/"
-    r = get(url, headers=headers)
-    note_en = r.json()["content"]
-    note_ch = r.json()["note"]
+    url="http://open.iciba.com/dsapi/"
+    r=get(url, headers=headers)
+    note_en=r.json()["content"]
+    note_ch=r.json()["note"]
     url='https://apis.tianapi.com/wanan/index?key={}'.format(key)
-    r = get(url,headers)
+    r=get(url,headers)
     note_wanan=r.json()['result']['content']
     return note_ch,note_en,note_wanan
  
@@ -113,29 +112,28 @@ def send_message(to_user,today_tips,tomorrow_tips,
                  zonghe,aiqing,caiyun,jiankang,gshu,
                  hotpoint1,hotpoint2,hotpoint3,
                  note_ch,note_en,note_wanan):
-    url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
-    yearx = localtime().tm_year
-    monthx = localtime().tm_mon
-    dayx = localtime().tm_mday
-    today = datetime.date(datetime(year=yearx, month=monthx, day=dayx))
+    url="https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
+    yearx=localtime().tm_year
+    monthx=localtime().tm_mon
+    dayx=localtime().tm_mday
+    today=datetime.date(datetime(year=yearx, month=monthx, day=dayx))
     # 获取在一起的日子的日期格式
-    love_year = int(config["love_date"].split("-")[0])
-    love_month = int(config["love_date"].split("-")[1])
-    love_day = int(config["love_date"].split("-")[2])
-    love_date = date(love_year, love_month, love_day)
+    love_year=int(config["love_date"].split("-")[0])
+    love_month=int(config["love_date"].split("-")[1])
+    love_day=int(config["love_date"].split("-")[2])
+    love_date=date(love_year, love_month, love_day)
     # 获取在一起的日期差
-    love_days = str(today.__sub__(love_date)).split(" ")[0]
+    love_days=str(today.__sub__(love_date)).split(" ")[0]
     #区分白天和晚上，推送不同模板
     timenow=datetime.now().hour
     if timenow<22:
         template=config["template_morning_id"]
     else:
         template=config["template_night_id"]
-    data = {
+    data={
         "touser": to_user,
         "template_id": template,
         "url": "http://weixin.qq.com/download",
-        # "topcolor": "#FF0000",
         "data": {
              "today_date": {
                 "value": today_date
@@ -214,12 +212,12 @@ def send_message(to_user,today_tips,tomorrow_tips,
             }
         }
     }
-    headers = {
+    headers={
         'Content-Type': 'application/json',
         'User-Agent': 'Mozilla/5.0 (today_windows NT 10.0; Win64; x64) '
                       'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
     }
-    response = post(url, headers=headers, json=data).json()
+    response=post(url, headers=headers, json=data).json()
     if response["errcode"] == 40037:
         print("推送消息失败,请检查模板id是否正确")
     elif response["errcode"] == 40036:
@@ -233,32 +231,32 @@ def send_message(to_user,today_tips,tomorrow_tips,
 
 
 if __name__ == "__main__":
-    headers = {
+    headers={
         'User-Agent': 'Mozilla/5.0 (today_windows NT 10.0; Win64; x64) '
                       'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
     }
     try:
         with open("config.txt", encoding="utf-8") as f:
-            config = eval(f.read())
+            config=eval(f.read())
     except FileNotFoundError:
         with open("git/ForChen/config.txt", encoding="utf-8") as f:
-            config = eval(f.read())
+            config=eval(f.read())
     except SyntaxError:
         print("推送消息失败,请检查配置文件格式是否正确")
 
     # 获取accessToken
-    accessToken = get_access_token()
+    accessToken=get_access_token()
     # 接收的用户
-    users = config["user"]
+    users=config["user"]
     # 传入地区
-    region = config["region"]
-    key = config["tianxing_key"]
+    region=config["region"]
+    key=config["tianxing_key"]
     today_date,today_weather,today_temp,today_wind,today_tips,\
         tomorrow_date,tomorrow_weather,tomorrow_temp,tomorrow_wind,tomorrow_tips=get_weather(headers,region,key)
     zonghe,aiqing,caiyun,jiankang,gshu=get_xingzuo(headers,key)
     hotpoint1,hotpoint2,hotpoint3=get_hotpoint(headers)
-    note_ch = config["note_ch"]
-    note_en = config["note_en"]
+    note_ch=config["note_ch"]
+    note_en=config["note_en"]
     # 获取词霸每日金句
     if note_ch == "" and note_en == "":
         note_ch,note_en,note_wanan=get_content(headers,key)
@@ -266,15 +264,15 @@ if __name__ == "__main__":
     b1=bir(config["birthday1"])
     name1=config["name1"]
     if b1==0:
-        birthdaydata1 = "今天是%s的生日哦,祝%s生日快乐!"%name1
+        birthdaydata1="今天是%s的生日哦,祝%s生日快乐!"%name1
     else:
-        birthdaydata1 = "距离%s的生日还有%s天"%(name1,b1)
+        birthdaydata1="距离%s的生日还有%s天"%(name1,b1)
     b2=bir(config["birthday2"])
     name2=config["name2"]
     if b2==0:
-        birthdaydata2 = "今天是%s的生日哦,祝自己生日快乐!"%name2
+        birthdaydata2="今天是%s的生日哦,祝自己生日快乐!"%name2
     else:
-        birthdaydata2 = "距离%s的生日还有%s天"%(name2,b2)
+        birthdaydata2="距离%s的生日还有%s天"%(name2,b2)
 
     # 公众号推送消息
     for user in users:
